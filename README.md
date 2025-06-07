@@ -1,5 +1,5 @@
 # ElderlyServicePlatform
-社区居家养老服务系统 后端（SpringBoot + Mybatis +Vue）
+社区居家养老服务系统 后端（SpringBoot + Mybatis +Vue）套用若依修改
 * 配套前端代码仓库地址[Vue](https://github.com/rise67/ElderlyServicePlatform-Vue.git) 
 # 该项目为本人毕业设计系统，需文档可联系 3112711487 
 # 运行界面图
