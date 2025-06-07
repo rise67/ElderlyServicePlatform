@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.elderly.manage.mapper.ActivityMapper">
+    
+    <resultMap type="Activity" id="ActivityResult">
+        <result property="activityId"    column="activity_id"    />
+        <result property="activityName"    column="activity_name"    />
+        <result property="activityTypeId"    column="activity_type_id"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="location"    column="location"    />
+        <result property="maxParticipants"    column="max_participants"    />
+        <result property="coverImage"    column="cover_image"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectActivityVo">
+        select activity_id, activity_name, activity_type_id, start_time, end_time, location, max_participants, cover_image, create_time, update_time, create_by, update_by, remark from tb_activity
+    </sql>
+
+    <select id="selectActivityList" parameterType="Activity" resultMap="ActivityResult">
+        <include refid="selectActivityVo"/>
+        <where>  
+            <if test="activityName != null  and activityName != ''"> and activity_name like concat('%', #{activityName}, '%')</if>
+            <if test="activityTypeId != null  and activityTypeId != ''"> and activity_type_id = #{activityTypeId}</if>
+        </where>
+    </select>
+    
+    <select id="selectActivityByActivityId" parameterType="String" resultMap="ActivityResult">
+        <include refid="selectActivityVo"/>
+        where activity_id = #{activityId}
+    </select>
+
+    <insert id="insertActivity" parameterType="Activity" useGeneratedKeys="true" keyProperty="activityId">
+        insert into tb_activity
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="activityName != null and activityName != ''">activity_name,</if>
+            <if test="activityTypeId != null and activityTypeId != ''">activity_type_id,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="location != null and location != ''">location,</if>
+            <if test="maxParticipants != null and maxParticipants != ''">max_participants,</if>
+            <if test="coverImage != null">cover_image,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="activityName != null and activityName != ''">#{activityName},</if>
+            <if test="activityTypeId != null and activityTypeId != ''">#{activityTypeId},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="location != null and location != ''">#{location},</if>
+            <if test="maxParticipants != null and maxParticipants != ''">#{maxParticipants},</if>
+            <if test="coverImage != null">#{coverImage},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateActivity" parameterType="Activity">
+        update tb_activity
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="activityName != null and activityName != ''">activity_name = #{activityName},</if>
+            <if test="activityTypeId != null and activityTypeId != ''">activity_type_id = #{activityTypeId},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="location != null and location != ''">location = #{location},</if>
+            <if test="maxParticipants != null and maxParticipants != ''">max_participants = #{maxParticipants},</if>
+            <if test="coverImage != null">cover_image = #{coverImage},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where activity_id = #{activityId}
+    </update>
+
+    <delete id="deleteActivityByActivityId" parameterType="String">
+        delete from tb_activity where activity_id = #{activityId}
+    </delete>
+
+    <delete id="deleteActivityByActivityIds" parameterType="String">
+        delete from tb_activity where activity_id in 
+        <foreach item="activityId" collection="array" open="(" separator="," close=")">
+            #{activityId}
+        </foreach>
+    </delete>
+
+    <!-- 在ActivityMapper.xml中添加 -->
+    <select id="getActivityDetailStats" resultType="map" parameterType="map">
+        SELECT
+        a.activity_name AS activityName,
+        a.activity_type AS activityType,
+        a.participant_count AS participantCount,
+        a.satisfaction_rate AS satisfactionRate,
+        DATE_FORMAT(a.activity_date, '%Y-%m-%d') AS activityDate
+        FROM
+        activity a
+        <where>
+            <if test="startDate != null and startDate != ''">
+                AND a.activity_date &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND a.activity_date &lt;= #{endDate}
+            </if>
+        </where>
+        ORDER BY
+        a.activity_date DESC
+        LIMIT 10
+    </select>
+</mapper>

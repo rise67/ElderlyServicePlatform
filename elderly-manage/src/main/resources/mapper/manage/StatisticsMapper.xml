@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.elderly.manage.mapper.StatisticsMapper">
+
+    <!-- 查询订单数量 -->
+    <select id="selectOrderCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+        SELECT COUNT(1) FROM tb_service_orders o
+        <where>
+            <if test="startDate != null">
+                AND o.create_time &gt;= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND o.create_time &lt;= #{endDate}
+            </if>
+            <if test="orderStatus != null and orderStatus != ''">
+                AND o.order_status = #{orderStatus}
+            </if>
+        </where>
+    </select>
+
+    <!-- 查询总收入 -->
+    <select id="selectTotalIncome" resultType="java.math.BigDecimal" parameterType="java.util.Map">
+        SELECT IFNULL(SUM(o.total_amount), 0) FROM tb_service_orders o
+        <where>
+            <if test="startDate != null">
+                AND o.create_time &gt;= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND o.create_time &lt;= #{endDate}
+            </if>
+            <if test="orderStatus != null and orderStatus != ''">
+                AND o.order_status = #{orderStatus}
+            </if>
+        </where>
+    </select>
+
+    <!-- 查询活跃用户数 -->
+    <select id="selectActiveUserCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+        SELECT COUNT(DISTINCT o.elderly_id) FROM tb_service_orders o
+        <where>
+            <if test="startDate != null">
+                AND o.create_time &gt;= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND o.create_time &lt;= #{endDate}
+            </if>
+        </where>
+    </select>
+
+    <!-- 查询订单趋势 -->
+    <select id="selectOrderTrend" resultType="java.util.Map" parameterType="java.util.Map">
+        <if test="interval == 'day'">
+            SELECT
+            DATE(o.create_time) as date,
+            COUNT(1) as count,
+            IFNULL(SUM(o.total_amount), 0) as amount
+            FROM tb_service_orders o
+            <where>
+                <if test="startDate != null">
+                    AND o.create_time &gt;= #{startDate}
+                </if>
+                <if test="endDate != null">
+                    AND o.create_time &lt;= #{endDate}
+                </if>
+            </where>
+            GROUP BY DATE(o.create_time)
+            ORDER BY date
+        </if>
+        <if test="interval == 'month'">
+            SELECT
+            DATE_FORMAT(o.create_time, '%Y-%m') as date,
+            COUNT(1) as count,
+            IFNULL(SUM(o.total_amount), 0) as amount
+            FROM tb_service_orders o
+            <where>
+                <if test="startDate != null">
+                    AND o.create_time &gt;= #{startDate}
+                </if>
+                <if test="endDate != null">
+                    AND o.create_time &lt;= #{endDate}
+                </if>
+            </where>
+            GROUP BY DATE_FORMAT(o.create_time, '%Y-%m')
+            ORDER BY date
+        </if>
+    </select>
+
+    <!-- 查询服务类型分布 -->
+    <select id="selectServiceDistribution" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+        s.service_name as name,
+        COUNT(i.item_id) as value
+        FROM tb_order_items i
+        JOIN tb_service_orders o ON i.order_id = o.order_id
+        JOIN tb_services s ON i.service_id = s.id
+        <where>
+            <if test="startDate != null">
+                AND o.create_time &gt;= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND o.create_time &lt;= #{endDate}
+            </if>
+        </where>
+        GROUP BY s.service_name
+        ORDER BY value DESC
+    </select>
+
+    <!-- 查询订单状态分布 -->
+    <select id="selectOrderStatusDistribution" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+        CASE order_status
+        WHEN '0' THEN '已预约'
+        WHEN '1' THEN '服务中'
+        WHEN '2' THEN '已完成'
+        END as name,
+        COUNT(1) as value
+        FROM tb_service_orders o
+        <where>
+            <if test="startDate != null">
+                AND o.create_time &gt;= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND o.create_time &lt;= #{endDate}
+            </if>
+        </where>
+        GROUP BY order_status
+    </select>
+
+    <!-- 查询服务人员排行 -->
+    <select id="selectProviderRanking" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+        p.name,
+        COUNT(o.order_id) as value
+        FROM tb_service_orders o
+        JOIN tb_service_providers p ON o.provider_id = p.id
+        <where>
+            <if test="startDate != null">
+                AND o.create_time &gt;= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND o.create_time &lt;= #{endDate}
+            </if>
+        </where>
+        GROUP BY p.name
+        ORDER BY value DESC
+        LIMIT 5
+    </select>
+
+    <!-- 查询服务类型详细统计 -->
+    <select id="selectServiceDetailStats" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+        s.service_name as serviceName,
+        COUNT(i.item_id) as orderCount,
+        IFNULL(SUM(i.item_amount), 0) as totalIncome,
+        COUNT(DISTINCT o.elderly_id) as userCount,
+        IFNULL(AVG(i.hourly_rate), 0) as avgPrice
+        FROM tb_order_items i
+        JOIN tb_service_orders o ON i.order_id = o.order_id
+        JOIN tb_services s ON i.service_id = s.id
+        <where>
+            <if test="startDate != null">
+                AND o.create_time &gt;= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND o.create_time &lt;= #{endDate}
+            </if>
+        </where>
+        GROUP BY s.service_name
+        ORDER BY orderCount DESC
+    </select>
+</mapper>

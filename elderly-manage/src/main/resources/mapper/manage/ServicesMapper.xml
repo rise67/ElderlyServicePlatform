@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.elderly.manage.mapper.ServicesMapper">
+    
+    <resultMap type="Services" id="ServicesResult">
+        <result property="id"    column="id"    />
+        <result property="serviceName"    column="service_name"    />
+        <result property="serviceDesc"    column="service_desc"    />
+        <result property="price"    column="price"    />
+        <result property="serviceCategory"    column="service_category"    />
+        <result property="details"    column="details"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="dateTime"    column="date_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectServicesVo">
+        select id, service_name, service_desc, price, service_category, details, create_time, date_time, create_by, update_by, remark from tb_services
+    </sql>
+
+    <select id="selectServicesList" parameterType="Services" resultMap="ServicesResult">
+        <include refid="selectServicesVo"/>
+        <where>  
+            <if test="serviceName != null  and serviceName != ''"> and service_name like concat('%', #{serviceName}, '%')</if>
+            <if test="serviceCategory != null  and serviceCategory != ''"> and service_category = #{serviceCategory}</if>
+        </where>
+    </select>
+    
+    <select id="selectServicesById" parameterType="String" resultMap="ServicesResult">
+        <include refid="selectServicesVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertServices" parameterType="Services" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_services
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="serviceName != null and serviceName != ''">service_name,</if>
+            <if test="serviceDesc != null and serviceDesc != ''">service_desc,</if>
+            <if test="price != null">price,</if>
+            <if test="serviceCategory != null and serviceCategory != ''">service_category,</if>
+            <if test="details != null and details != ''">details,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="dateTime != null">date_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="serviceName != null and serviceName != ''">#{serviceName},</if>
+            <if test="serviceDesc != null and serviceDesc != ''">#{serviceDesc},</if>
+            <if test="price != null">#{price},</if>
+            <if test="serviceCategory != null and serviceCategory != ''">#{serviceCategory},</if>
+            <if test="details != null and details != ''">#{details},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="dateTime != null">#{dateTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateServices" parameterType="Services">
+        update tb_services
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="serviceName != null and serviceName != ''">service_name = #{serviceName},</if>
+            <if test="serviceDesc != null and serviceDesc != ''">service_desc = #{serviceDesc},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="serviceCategory != null and serviceCategory != ''">service_category = #{serviceCategory},</if>
+            <if test="details != null and details != ''">details = #{details},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="dateTime != null">date_time = #{dateTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteServicesById" parameterType="String">
+        delete from tb_services where id = #{id}
+    </delete>
+
+    <delete id="deleteServicesByIds" parameterType="String">
+        delete from tb_services where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.elderly.manage.mapper.ServiceProvidersMapper">
+    
+    <resultMap type="ServiceProviders" id="ServiceProvidersResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="gender"    column="gender"    />
+        <result property="address"    column="address"    />
+        <result property="contactNumber"    column="contact_number"    />
+        <result property="age"    column="age"    />
+        <result property="experienceYears"    column="experience_years"    />
+        <result property="details"    column="details"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectServiceProvidersVo">
+        select id, name, gender, address, contact_number, age, experience_years, details, create_time, update_time, create_by, update_by, remark from tb_service_providers
+    </sql>
+
+    <select id="selectServiceProvidersList" parameterType="ServiceProviders" resultMap="ServiceProvidersResult">
+        <include refid="selectServiceProvidersVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectServiceProvidersById" parameterType="String" resultMap="ServiceProvidersResult">
+        <include refid="selectServiceProvidersVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertServiceProviders" parameterType="ServiceProviders" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_service_providers
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">name,</if>
+            <if test="gender != null and gender != ''">gender,</if>
+            <if test="address != null and address != ''">address,</if>
+            <if test="contactNumber != null and contactNumber != ''">contact_number,</if>
+            <if test="age != null and age != ''">age,</if>
+            <if test="experienceYears != null and experienceYears != ''">experience_years,</if>
+            <if test="details != null and details != ''">details,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="gender != null and gender != ''">#{gender},</if>
+            <if test="address != null and address != ''">#{address},</if>
+            <if test="contactNumber != null and contactNumber != ''">#{contactNumber},</if>
+            <if test="age != null and age != ''">#{age},</if>
+            <if test="experienceYears != null and experienceYears != ''">#{experienceYears},</if>
+            <if test="details != null and details != ''">#{details},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateServiceProviders" parameterType="ServiceProviders">
+        update tb_service_providers
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="gender != null and gender != ''">gender = #{gender},</if>
+            <if test="address != null and address != ''">address = #{address},</if>
+            <if test="contactNumber != null and contactNumber != ''">contact_number = #{contactNumber},</if>
+            <if test="age != null and age != ''">age = #{age},</if>
+            <if test="experienceYears != null and experienceYears != ''">experience_years = #{experienceYears},</if>
+            <if test="details != null and details != ''">details = #{details},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteServiceProvidersById" parameterType="String">
+        delete from tb_service_providers where id = #{id}
+    </delete>
+
+    <delete id="deleteServiceProvidersByIds" parameterType="String">
+        delete from tb_service_providers where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

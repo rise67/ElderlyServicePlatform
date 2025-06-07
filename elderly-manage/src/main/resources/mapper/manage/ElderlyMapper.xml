@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.elderly.manage.mapper.ElderlyMapper">
+    
+    <resultMap type="Elderly" id="ElderlyResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="gender"    column="gender"    />
+        <result property="phone"    column="phone"    />
+        <result property="address"    column="address"    />
+        <result property="age"    column="age"    />
+        <result property="emergencyContact"    column="emergency_contact"    />
+        <result property="emergencyPhone"    column="emergency_phone"    />
+        <result property="healthDescription"    column="health_description"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectElderlyVo">
+        select id, name, gender, phone, address, age, emergency_contact, emergency_phone, health_description, create_time, update_time, create_by, update_by, remark from tb_elderly
+    </sql>
+
+    <select id="selectElderlyList" parameterType="Elderly" resultMap="ElderlyResult">
+        <include refid="selectElderlyVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="age != null  and age != ''"> and age = #{age}</if>
+        </where>
+    </select>
+    
+    <select id="selectElderlyById" parameterType="String" resultMap="ElderlyResult">
+        <include refid="selectElderlyVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertElderly" parameterType="Elderly" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_elderly
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">name,</if>
+            <if test="gender != null">gender,</if>
+            <if test="phone != null and phone != ''">phone,</if>
+            <if test="address != null and address != ''">address,</if>
+            <if test="age != null">age,</if>
+            <if test="emergencyContact != null">emergency_contact,</if>
+            <if test="emergencyPhone != null">emergency_phone,</if>
+            <if test="healthDescription != null">health_description,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="gender != null">#{gender},</if>
+            <if test="phone != null and phone != ''">#{phone},</if>
+            <if test="address != null and address != ''">#{address},</if>
+            <if test="age != null">#{age},</if>
+            <if test="emergencyContact != null">#{emergencyContact},</if>
+            <if test="emergencyPhone != null">#{emergencyPhone},</if>
+            <if test="healthDescription != null">#{healthDescription},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateElderly" parameterType="Elderly">
+        update tb_elderly
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="gender != null">gender = #{gender},</if>
+            <if test="phone != null and phone != ''">phone = #{phone},</if>
+            <if test="address != null and address != ''">address = #{address},</if>
+            <if test="age != null">age = #{age},</if>
+            <if test="emergencyContact != null">emergency_contact = #{emergencyContact},</if>
+            <if test="emergencyPhone != null">emergency_phone = #{emergencyPhone},</if>
+            <if test="healthDescription != null">health_description = #{healthDescription},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteElderlyById" parameterType="String">
+        delete from tb_elderly where id = #{id}
+    </delete>
+
+    <delete id="deleteElderlyByIds" parameterType="String">
+        delete from tb_elderly where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

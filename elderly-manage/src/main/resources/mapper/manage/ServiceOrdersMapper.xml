@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.elderly.manage.mapper.ServiceOrdersMapper">
+    
+    <resultMap type="ServiceOrders" id="ServiceOrdersResult">
+        <result property="orderId"    column="order_id"    />
+        <result property="elderlyId"    column="elderly_id"    />
+        <result property="providerId"    column="provider_id"    />
+        <result property="serviceAddress"    column="service_address"    />
+        <result property="totalAmount"    column="total_amount"    />
+        <result property="orderStatus"    column="order_status"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <resultMap type="OrderItems" id="OrderItemsResult">
+        <result property="itemId"    column="item_id"    />
+        <result property="orderId"    column="order_id"    />
+        <result property="serviceId"    column="service_id"    />
+        <result property="hourlyRate"    column="hourly_rate"    />
+        <result property="serviceHours"    column="service_hours"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="itemAmount"    column="item_amount"    />
+    </resultMap>
+
+    <sql id="selectServiceOrdersVo">
+        select order_id, elderly_id, provider_id, service_address, total_amount, order_status, create_time, update_time, remark from tb_service_orders
+    </sql>
+
+    <select id="selectServiceOrdersList" parameterType="ServiceOrders" resultMap="ServiceOrdersResult">
+        <include refid="selectServiceOrdersVo"/>
+        <where>  
+            <if test="elderlyId != null  and elderlyId != ''"> and elderly_id = #{elderlyId}</if>
+            <if test="providerId != null  and providerId != ''"> and provider_id = #{providerId}</if>
+        </where>
+    </select>
+    
+    <select id="selectServiceOrdersByOrderId" parameterType="String" resultMap="ServiceOrdersResult">
+        <include refid="selectServiceOrdersVo"/>
+        where order_id = #{orderId}
+    </select>
+
+    <select id="selectOrderItemsByOrderId" resultMap="OrderItemsResult">
+        select * from tb_order_items where order_id = #{orderId}
+    </select>
+
+    <insert id="insertServiceOrders" parameterType="ServiceOrders">
+        insert into tb_service_orders (
+            order_id,elderly_id,provider_id,service_address,total_amount,order_status,create_time)
+            values (#{orderId},#{elderlyId},#{providerId},#{serviceAddress},#{totalAmount},#{orderStatus},sysdate())
+    </insert>
+
+    <update id="updateServiceOrders" parameterType="ServiceOrders">
+        update tb_service_orders
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="elderlyId != null and elderlyId != ''">elderly_id = #{elderlyId},</if>
+            <if test="providerId != null and providerId != ''">provider_id = #{providerId},</if>
+            <if test="serviceAddress != null and serviceAddress != ''">service_address = #{serviceAddress},</if>
+            <if test="totalAmount != null">total_amount = #{totalAmount},</if>
+            <if test="orderStatus != null and orderStatus != ''">order_status = #{orderStatus},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where order_id = #{orderId}
+    </update>
+
+    <delete id="deleteServiceOrdersByOrderId" parameterType="String">
+        delete from tb_service_orders where order_id = #{orderId}
+    </delete>
+
+    <delete id="deleteServiceOrdersByOrderIds" parameterType="String">
+        delete from tb_service_orders where order_id in 
+        <foreach item="orderId" collection="array" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+    </delete>
+</mapper>
