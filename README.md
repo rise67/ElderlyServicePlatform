@@ -15,6 +15,3 @@
 ![image](https://github.com/user-attachments/assets/a93703d9-796a-43c9-8b1f-801a492b083c)
 
 
-如果帮助到你的话 可以支持下作者哦 非常感谢
-![795536b96d6a5941fd96651598d32b7f](https://github.com/user-attachments/assets/f9d96bda-f054-4576-9cc0-76230b6fbf96)
-
